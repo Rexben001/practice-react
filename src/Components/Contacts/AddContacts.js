@@ -29,7 +29,8 @@ class AddContacts extends Component {
             name: '',
             email: '',
             phone: ''
-        })
+        });
+        this.props.history.push('/');
     }
     render() {
         const { name, email, phone } = this.state;

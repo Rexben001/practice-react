@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 
 const Header = (props) => {
@@ -10,7 +11,9 @@ const Header = (props) => {
                 <div>
                     <ul className="navbar-nav mr-auto">
                         <li className="nav-item">
-                            <a href="/" className="nav-link"> Home</a>
+                            <Link to="/" className="nav-link"> Home</Link>
+                            <Link to="/contacts/add" className="nav-link"> Add</Link>
+                            <Link to="/about" className="nav-link"> HomAboute</Link>
                         </li>
                     </ul>
                 </div>
