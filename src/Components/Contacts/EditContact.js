@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Consumer } from '../../context';
 import TextInputGroup from '../layout/TextInputGroup';
 
-class AddContacts extends Component {
+class EditContact extends Component {
     state = {
         name: '',
         latitude: '',
@@ -10,35 +10,39 @@ class AddContacts extends Component {
         status: ''
     }
     onChange = e => this.setState({ [e.target.name]: e.target.value })
-    createID = () => {
-        const id = Math.floor(Math.random() * 8980) + 101;
-        return id;
-    }
-    onSubmit = (dispatch, e) => {
-        e.preventDefault();
-
-        const { name, latitude, description, status } = this.state;
-        const newContact = {
-            name,
-            latitude,
-            description,
-            longitude: '23467',
-            status,
-            placedBy: 1
-        };
-         const headerMethod = {
-      method: "POST",
-      body: JSON.stringify(newContact),
+    componentDidMount() {
+        const {id} = this.props.match.params;
+            const headerMethod = {
+      method: "GET",
       headers: {
         "Content-Type": "application/json"
       }
     };
-  fetch(`http://localhost:3001/api/v1/reports`, headerMethod)
+    const res = (data) => data.message[0];
+         fetch(`http://localhost:3001/api/v1/reports/${id}`, headerMethod)
       .then(response => response.json())
-      .then(res => dispatch({ type: 'ADD_CONTACT', payload: res.message[0] }))
+      .then(data =>  this.setState({name: res(data).name, latitude: res(data).latitude, description: res(data).description, status: res(data).status}))
       .catch(e => console.log(e));
-        
-
+    }
+    onSubmit = (dispatch, e) => {
+        e.preventDefault();
+    const {latitude} = this.state;
+    const updateContact ={
+        latitude,
+        longitude: '4567',
+    }
+        const {id} = this.props.match.params;
+  const headerMethod = {
+      method: "PATCH",
+      body: JSON.stringify(updateContact),
+      headers: {
+        "Content-Type": "application/json"
+      }
+    };
+         fetch(`http://localhost:3001/api/v1/reports/${id}/edit`, headerMethod)
+      .then(response => response.json())
+      .then(res => dispatch({ type: 'EDIT_CONTACT', payload: res.message[0] }))
+      .catch(e => console.log(e));
         this.setState({
             name: '',
             latitude: '',
@@ -87,7 +91,7 @@ class AddContacts extends Component {
                                         value={status}
                                         onChange={this.onChange}
                                     />
-                                    <input type="submit" value="Add Contact" className="btn btn-light btn-block" />
+                                    <input type="submit" value="Update Contact" className="btn btn-light btn-block" />
                                 </form>
                             </div>
                         </div>
@@ -99,4 +103,4 @@ class AddContacts extends Component {
     }
 }
 
-export default AddContacts;
+export default EditContact;
