@@ -1,102 +1,85 @@
 import React, { Component } from 'react';
-import { Consumer } from '../../context';
 import TextInputGroup from '../layout/TextInputGroup';
+import PropTypes from 'prop-types';
+import {connect} from 'react-redux';
+import{addContact} from '../../actions/contactActions';
 
-class AddContacts extends Component {
-    state = {
-        name: '',
-        latitude: '',
-        description: '',
-        status: ''
-    }
-    onChange = e => this.setState({ [e.target.name]: e.target.value })
-    createID = () => {
-        const id = Math.floor(Math.random() * 8980) + 101;
-        return id;
-    }
-    onSubmit = (dispatch, e) => {
-        e.preventDefault();
+class AddContact extends Component {
+  state = {
+    name: '',
+    email: '',
+    phone: '',
+  };
 
-        const { name, latitude, description, status } = this.state;
-        const newContact = {
-            name,
-            latitude,
-            description,
-            longitude: '23467',
-            status,
-            placedBy: 1
-        };
-         const headerMethod = {
-      method: "POST",
-      body: JSON.stringify(newContact),
-      headers: {
-        "Content-Type": "application/json"
-      }
+  onSubmit = (e) => {
+    e.preventDefault();
+
+    const { name, email, phone } = this.state;
+
+    const newContact = {
+        id: 1,
+      name,
+      email,
+      phone
     };
-  fetch(`http://localhost:3001/api/v1/reports`, headerMethod)
-      .then(response => response.json())
-      .then(res => dispatch({ type: 'ADD_CONTACT', payload: res.message[0] }))
-      .catch(e => console.log(e));
-        
 
-        this.setState({
-            name: '',
-            latitude: '',
-            description: '',
-            status: ''
-        });
-        this.props.history.push('/');
-    }
-    render() {
-        const { name, latitude, description, status } = this.state;
-        return (
-            <Consumer>
-                {value => {
-                    const { dispatch } = value;
-                    return (
-                        <div className="card mb-3">
-                            <div className="card-header">Add Contacts
-                        </div>
-                            <div className="card-body">
-                                <form onSubmit={this.onSubmit.bind(this, dispatch)}>
-                                    <TextInputGroup
-                                        name="name"
-                                        label="Name"
-                                        placeholder="Enter a name"
-                                        value={name}
-                                        onChange={this.onChange}
-                                    />
-                                    <TextInputGroup
-                                        name="latitude"
-                                        label="latitude"
-                                        placeholder="Enter a latitude"
-                                        value={latitude}
-                                        onChange={this.onChange}
-                                    />
-                                    <TextInputGroup
-                                        name="description"
-                                        label="Description"
-                                        placeholder="Enter a description"
-                                        value={description}
-                                        onChange={this.onChange}
-                                    />
-                                      <TextInputGroup
-                                        name="status"
-                                        label="Status"
-                                        placeholder="Enter a status"
-                                        value={status}
-                                        onChange={this.onChange}
-                                    />
-                                    <input type="submit" value="Add Contact" className="btn btn-light btn-block" />
-                                </form>
-                            </div>
-                        </div>
-                    );
-                }}
-            </Consumer>
-        )
+    //// SUBMIT CONTACT ////
 
-    }
+    this.props.addContact(newContact);
+
+    // Clear State
+    this.setState({
+      name: '',
+      email: '',
+      phone: ''
+    });
+
+    this.props.history.push('/');
+  };
+
+  onChange = e => this.setState({ [e.target.name]: e.target.value });
+
+  render() {
+    const { name, email, phone, errors } = this.state;
+
+    return (
+      <div className="card mb-3">
+        <div className="card-header">Add Contact</div>
+        <div className="card-body">
+          <form onSubmit={this.onSubmit}>
+            <TextInputGroup
+              label="Name"
+              name="name"
+              placeholder="Enter Name"
+              value={name}
+              onChange={this.onChange}
+              
+            />
+            <TextInputGroup
+              label="Email"
+              name="email"
+              type="email"
+              placeholder="Enter Email"
+              value={email}
+              onChange={this.onChange}
+            />
+            <TextInputGroup
+              label="Phone"
+              name="phone"
+              placeholder="Enter Phone"
+              value={phone}
+              onChange={this.onChange}
+            />
+            <input
+              type="submit"
+              value="Add Contact"
+              className="btn btn-light btn-block"
+            />
+          </form>
+        </div>
+      </div>
+    );
+  }
 }
 
-export default AddContacts;
+export default connect(null, {addContact})(AddContact);

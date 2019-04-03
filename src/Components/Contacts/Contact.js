@@ -1,60 +1,65 @@
 import React, { Component } from 'react';
+import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
-import {Link} from 'react-router-dom';
-import { Consumer } from '../../context';
+import {connect} from 'react-redux';
+import{deleteContact} from '../../actions/contactActions';
 
 class Contact extends Component {
-    static propTypes = {
-        contact: PropTypes.object.isRequired
-    }
-    state = { showInfo: false };
-    deleteContact = (id, dispatch) => {
-         const headerMethod = {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json"
-      }
-    };
-         fetch(`http://localhost:3001/api/v1/reports/${id}/cancel`, headerMethod)
-      .then(response => response.json())
-      .then(data => dispatch({ type: 'DELETE_CONTACT', payload: id }))
-      .catch(e => console.log(e));
-        
-    }
-    render() {
-        const { id, name, latitude, description, status } = this.props.contact;
-        return (
-            <Consumer>
-                {value => {
-                    const { dispatch } = value;
-                    return (
-                        <div className="card card-body mb-3">
-                            <h4>
-                                {name}
-                                <span style={{ fontStyle: 'italic', color: 'blue', cursor: 'pointer' }} onClick={() => this.setState({ showInfo: !this.state.showInfo })}> v</span>
-                                <span style={{ fontStyle: 'italic', color: 'red', cursor: 'pointer', float: 'right' }} onClick={this.deleteContact.bind(this, id, dispatch)}> X</span>
-                                <span style={{ fontStyle: 'italic', color: 'green', cursor: 'pointer', float: 'right', marginRight: '10px'}}><Link to={`contacts/edit/${id}`}> Edit</Link></span>
-                            </h4>
-                            {this.state.showInfo ? (
-                                <ul className="list-group">
-                                    <li className="list-group-item">Latitude: {latitude}</li>
-                                    <li className="list-group-item">Description: {description}</li>
-                                    <li className="list-group-item">Status: {status}</li>
+  state = {
+    showContactInfo: false
+  };
 
-                                </ul>
-                            ) : null}
-                        </div >
-                    )
-                }}
-            </Consumer>
-        )
-    }
+  onDeleteClick = id => {
+    //// DELETE CONTACT ////
+    this.props.deleteContact(id)
+
+  };
+
+  render() {
+    const { id, name, email, phone } = this.props.contact;
+    const { showContactInfo } = this.state;
+
+    return (
+      <div className="card card-body mb-3">
+        <h4>
+          {name}{' '}
+          <span
+            onClick={() =>
+              this.setState({
+                showContactInfo: !this.state.showContactInfo
+              })
+            }
+            className="fas fa-sort-down"
+            style={{ cursor: 'pointer', color: 'blue' }}>V
+          </span>
+          <span style={{ cursor: 'pointer', float: 'right', color: 'red' }}
+            onClick={this.onDeleteClick.bind(this, id)}>X
+          </span>
+          <Link to={`contact/edit/${id}`}>
+            <span  style={{
+                cursor: 'pointer',
+                float: 'right',
+                color: 'blue',
+                marginRight: '1rem'
+              }}>
+             Edit
+            </span>
+          </Link>
+        </h4>
+        {showContactInfo ? (
+          <ul className="list-group">
+            <li className="list-group-item">Email: {email}</li>
+            <li className="list-group-item">Phone: {phone}</li>
+          </ul>
+        ) : null}
+      </div>
+    );
+  }
 }
 
-// Contact.propTypes = {
-//     name: PropTypes.string.isRequired,
-//     email: PropTypes.string.isRequired,
-//     phone: PropTypes.string.isRequired,
+Contact.propTypes = {
+  contact: PropTypes.object.isRequired,
+  deleteContact: PropTypes.func.isRequired
+};
 
-// }
-export default Contact;
+export default connect(null, {deleteContact})(Contact);

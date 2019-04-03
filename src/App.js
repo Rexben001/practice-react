@@ -7,13 +7,14 @@ import EditContact from './Components/Contacts/EditContact';
 import About from './Components/pages/About';
 import NotFound from './Components/pages/NotFound';
 
-import { Provider } from './context';
+import { Provider } from 'react-redux';
+import store from './store';
 import './assets/bootstrap.min.css';
 
 class App extends Component {
     render() {
         return (
-            <Provider>
+            <Provider store={store}>
                 <Router>
                     <div className="App">
                         <Header />
